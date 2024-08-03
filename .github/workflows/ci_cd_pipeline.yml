@@ -1,0 +1,43 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: pip install flake8
+      - name: Run Linter
+        run: flake8 model/ tests/
+
+  testing:
+    runs-on: ubuntu-latest
+    needs: linting
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Run Tests
+        run: pytest tests/
+
+  deployment:
+    runs-on: ubuntu-latest
+    needs: testing
+    steps:
+      - name: Deploy Model
+        run: echo "Deploying model..."
+        # Here you can add steps for actual deployment
